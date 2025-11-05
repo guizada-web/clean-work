@@ -1,4 +1,4 @@
-import { pool } from "./src/config/db.js";
+import { supabase } from "./src/config/db.js";
 
 const obras = [
   {
@@ -203,30 +203,33 @@ async function populateObras() {
     console.log("Inserindo obras de exemplo...");
 
     for (const obra of obras) {
-      const result = await pool.query(
-        "INSERT INTO obras (titulo, descricao, bairro, latitude, longitude, usuario_id, status, progresso, data_inicio, data_fim, valor_estimado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
-        [
-          obra.titulo,
-          obra.descricao,
-          obra.bairro,
-          obra.latitude,
-          obra.longitude,
-          obra.usuario_id,
-          obra.status,
-          obra.progresso,
-          obra.data_inicio,
-          obra.data_fim,
-          obra.valor_estimado
-        ]
-      );
-      console.log(`✓ Inserida: ${obra.titulo}`);
+      const { data, error } = await supabase
+        .from('obras')
+        .insert({
+          titulo: obra.titulo,
+          descricao: obra.descricao,
+          bairro: obra.bairro,
+          latitude: obra.latitude,
+          longitude: obra.longitude,
+          usuario_id: obra.usuario_id,
+          status: obra.status,
+          progresso: obra.progresso,
+          data_inicio: obra.data_inicio,
+          data_fim: obra.data_fim,
+          valor_estimado: obra.valor_estimado
+        })
+        .select();
+
+      if (error) {
+        console.error(`Erro ao inserir ${obra.titulo}:`, error);
+      } else {
+        console.log(`✓ Inserida: ${obra.titulo}`);
+      }
     }
 
     console.log("Todas as obras foram inseridas com sucesso!");
   } catch (error) {
     console.error("Erro ao inserir obras:", error);
-  } finally {
-    await pool.end();
   }
 }
 

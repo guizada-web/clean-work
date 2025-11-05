@@ -1,9 +1,9 @@
-import pkg from "pg";
-const { Pool } = pkg;
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
-export const pool = new Pool({
-  connectionString: "postgresql://postgres:cleanwork7.@cxppkhiirfkwzhoouglo.supabase.co:5432/postgres",
-  ssl: { rejectUnauthorized: false },
-  connectionTimeoutMillis: 10000,
-  query_timeout: 10000
-});
+dotenv.config();
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
