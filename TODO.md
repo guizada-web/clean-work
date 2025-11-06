@@ -1,8 +1,6 @@
-# TODO: Integrate Supabase SDK into Backend
-
-- [x] Install @supabase/supabase-js in backend
-- [x] Create .env file with SUPABASE_URL and SUPABASE_KEY
-- [x] Update db.js to export Supabase client instead of pg Pool
-- [x] Refactor obraModel.js to use Supabase client for CRUD operations
-- [x] Refactor demandaModel.js to use Supabase client for CRUD operations
-- [x] Test the backend connection by running the server
+- [x] Modificar MapView.jsx para carregar demandas via API
+- [x] Adicionar estado para demandas no MapView
+- [x] Adicionar markers para demandas no mapa com cores por status
+- [x] Ajustar popup content para demandas
+- [x] Atualizar contador no mapa para incluir demandas
+- [x] Testar o mapa após mudanças

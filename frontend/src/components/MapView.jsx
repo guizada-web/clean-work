@@ -3,9 +3,18 @@ import L from "leaflet";
 import 'leaflet/dist/leaflet.css';
 import api from "../services/api";
 
+// Fix for default markers in webpack
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
 export default function MapView() {
   const mapRef = useRef(null);
   const [obras, setObras] = useState([]);
+  const [demandas, setDemandas] = useState([]);
 
   const carregarObras = async () => {
     try {
@@ -16,8 +25,18 @@ export default function MapView() {
     }
   };
 
+  const carregarDemandas = async () => {
+    try {
+      const res = await api.get("/demandas");
+      setDemandas(res.data);
+    } catch (error) {
+      console.error("Erro ao carregar demandas:", error);
+    }
+  };
+
   useEffect(() => {
     carregarObras();
+    carregarDemandas();
   }, []);
 
   useEffect(() => {
@@ -42,7 +61,7 @@ export default function MapView() {
   }, []);
 
   useEffect(() => {
-    if (!mapRef.current || obras.length === 0) return;
+    if (!mapRef.current || (obras.length === 0 && demandas.length === 0)) return;
 
     // Limpar marcadores existentes
     mapRef.current.eachLayer((layer) => {
@@ -51,24 +70,28 @@ export default function MapView() {
       }
     });
 
+    const statusColor = {
+      'planejada': '#fbbf24',
+      'pendente': '#fbbf24',
+      'em_andamento': '#3b82f6',
+      'concluida': '#10b981',
+      'resolvida': '#10b981',
+      'cancelada': '#ef4444'
+    };
+
+    const statusText = {
+      'planejada': 'Planejada',
+      'pendente': 'Pendente',
+      'em_andamento': 'Em Andamento',
+      'concluida': 'Concluída',
+      'resolvida': 'Resolvida',
+      'cancelada': 'Cancelada'
+    };
+
     // Adicionar marcadores das obras
     obras.forEach((obra) => {
       if (obra.latitude && obra.longitude) {
         const marker = L.marker([obra.latitude, obra.longitude]).addTo(mapRef.current);
-
-        const statusColor = {
-          'planejada': '#fbbf24',
-          'em_andamento': '#3b82f6',
-          'concluida': '#10b981',
-          'cancelada': '#ef4444'
-        };
-
-        const statusText = {
-          'planejada': 'Planejada',
-          'em_andamento': 'Em Andamento',
-          'concluida': 'Concluída',
-          'cancelada': 'Cancelada'
-        };
 
         const popupContent = `
           <div style="font-family: Arial, sans-serif; max-width: 250px;">
@@ -90,7 +113,30 @@ export default function MapView() {
         marker.bindPopup(popupContent);
       }
     });
-  }, [obras]);
+
+    // Adicionar marcadores das demandas
+    demandas.forEach((demanda) => {
+      if (demanda.latitude && demanda.longitude) {
+        const marker = L.marker([demanda.latitude, demanda.longitude]).addTo(mapRef.current);
+
+        const popupContent = `
+          <div style="font-family: Arial, sans-serif; max-width: 250px;">
+            <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 16px;">${demanda.titulo}</h3>
+            <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 14px;">${demanda.descricao}</p>
+            <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 12px;">Bairro: ${demanda.bairro}</p>
+            <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 12px;">${demanda.cidade}, ${demanda.estado}</p>
+            <div style="display: flex; align-items: center; margin-bottom: 4px;">
+              <span style="background: ${statusColor[demanda.status] || '#6b7280'}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">
+                ${statusText[demanda.status] || demanda.status}
+              </span>
+            </div>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+      }
+    });
+  }, [obras, demandas]);
 
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
@@ -107,8 +153,8 @@ export default function MapView() {
         fontSize: "12px",
         zIndex: 1000
       }}>
-        <strong>Obras Públicas</strong><br/>
-        {obras.length} obra{obras.length !== 1 ? 's' : ''} cadastrada{obras.length !== 1 ? 's' : ''}
+        <strong>Obras Públicas e Demandas</strong><br/>
+        {obras.length} obra{obras.length !== 1 ? 's' : ''} e {demandas.length} demanda{demandas.length !== 1 ? 's' : ''} cadastrada{demandas.length !== 1 ? 's' : ''}
       </div>
     </div>
   );
