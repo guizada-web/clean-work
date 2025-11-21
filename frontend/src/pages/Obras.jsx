@@ -93,7 +93,6 @@ export default function Obras() {
     // Simples: gera uma nova janela com a tabela e aciona impressão em modo PDF
     imprimirTabela();
   };
-
   return (
     <div className="app-container">
       <Navbar />
@@ -108,7 +107,7 @@ export default function Obras() {
           Monitoramento de Obras Públicas
         </h1>
 
-        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+  <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
           <aside style={{ width: 260, background: 'var(--card-bg)', padding: 16, borderRadius: 8, border: '1px solid var(--border)' }}>
             <h3 style={{ marginTop: 0, marginBottom: 12, color: 'var(--text)' }}>Filtros</h3>
             <div style={{ marginBottom: 12 }}>
