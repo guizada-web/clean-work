@@ -4,6 +4,7 @@ import api from '../services/api.js';
 
 const Register = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +17,7 @@ const Register = () => {
       return;
     }
     try {
-      await api.post('/auth/register', { username, password });
+      await api.post('/auth/register', { username, email, password });
       alert('Cadastro realizado com sucesso! Faça login.');
       navigate('/');
     } catch (err) {
@@ -30,7 +31,7 @@ const Register = () => {
       justifyContent: 'center',
       alignItems: 'center',
       height: '100vh',
-      background: 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("/obra.jpg")',
+      background: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/fundo-login.jpg")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
@@ -68,6 +69,31 @@ const Register = () => {
           Cadastro de Usuário
         </h1>
         <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '1rem' }}>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '0.5rem',
+                        color: '#1a202c',
+                        fontWeight: '600'
+                      }}>
+                        E-mail:
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          border: '1px solid #cbd5e0',
+                          borderRadius: '4px',
+                          background: '#ffffff',
+                          color: '#1a202c',
+                          boxSizing: 'border-box'
+                        }}
+                        required
+                      />
+                    </div>
           <div style={{ marginBottom: '1rem' }}>
             <label style={{
               display: 'block',
@@ -157,7 +183,7 @@ const Register = () => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              background: '#28a745',
+              background: '#ff8c00',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
@@ -171,13 +197,13 @@ const Register = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/login')}
             style={{
               width: '100%',
               padding: '0.75rem',
               background: '#ffffff',
-              color: '#28a745',
-              border: '2px solid #28a745',
+              color: '#ff8c00',
+              border: '2px solid #ff8c00',
               borderRadius: '4px',
               cursor: 'pointer',
               fontSize: '1rem',
